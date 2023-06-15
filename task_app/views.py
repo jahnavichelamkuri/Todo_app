@@ -18,18 +18,30 @@ from django.views.decorators.csrf import csrf_exempt
 def create_task(request,user,task,description,status):
     Task.objects.create(user=user,task=task,description=description,status=status)
 
-    response_data={"message":"insertion successfull"}
+    response_data={"message":"successfull"}
     return response_data
 
 
-def delete_task(request):
+def fetch_data(request,user):
+    data = Task.objects.filter(user=user,status="In Progress")
+    task_list = []
+    for item in data:
+        task_list.append(item.task)
+            
+    response_data = {
+        "task" : task_list,
+    }
+    print(task_list)
+            
+    return response_data
+
+def update_task(request,user):
     pass
 
-def update_task(request):
-    pass
 
 def read_task(request):
-    pass
+    
+       pass
 
 class Todo(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -47,13 +59,14 @@ class Todo(APIView):
                 response =update_task(request)
             elif type =="read":
                 response = read_task(request)
-            elif type =="delete":
-                response = delete_task(request)
+            elif type =="fetch_data":
+                response = fetch_data(request,user)
             return JsonResponse(response)
         except Exception as e:
             return Response({'error': str(e)})
 
     def post(self,request,*args,**kwargs):
+        print("POST")
         try:
             type = self.request.GET.get('type')
             print(type)
@@ -69,7 +82,7 @@ class Todo(APIView):
             elif type =="read":
                 response = read_task(request)
             elif type =="delete":
-                response = delete_task(request)
+                response = fetch_data(request)
             return JsonResponse(response)
         except Exception as e:
             return Response({'error': str(e)})

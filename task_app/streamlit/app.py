@@ -108,7 +108,7 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
     #         st.title("History")
     #         # Add your history implementation here
 
-    # if __name__ == "__main__":
+    # if _name_ == "_main_":
     #     main()
 
     selected = option_menu(
@@ -117,23 +117,43 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
         orientation = "horizontal",
     )
     if selected == "To-Do":
-        st.sidebar.title("tasks list")
-        task = st.text_input("Task")
-        add = st.button("ADD TASK")
-        
-        if add:
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.title("To-Do")
+            task = st.text_input("Task")
+            add = st.button("ADD TASK")
             data ={
-            "user ":userName,
-            "task" :task,
-            "description":"",
-            "status":"In Progress",
-        }
-            url=local_host+'todo/?type=create'
+                "user ":userName,
+                "task" :task,
+                "description":"",
+                "status":"In Progress",
+            }
+            if add:
+                url=local_host+'todo/?type=create'
+                headers = {'Authorization': f'Bearer {token}'}
+                response=requests.post(url,headers=headers,params=data)
+                if response.status_code == 200:
+                    st.success("added")
+                else:
+                    st.error("Failed")
+            
+        with col2:
+            # st.sidebar.title("Menu")
+            st.title("Tasks List")
+            url = local_host + 'todo/?type=fetch_data'
             headers = {'Authorization': f'Bearer {token}'}
-            response=requests.post(url,headers=headers,params=data)
+            data = {
+                "user" :userName
+            }
+            response = requests.get(url, headers=headers,params=data)
             if response.status_code == 200:
-                st.success("added")
-        
+                data = response.json()
+                # st.write(data)
+                tasks = data['task']
 
-    
-   
+                # for i in range(len(tasks)):
+                #     st.write(tasks[i])
+                for item in tasks:
+                    task_button=st.checkbox(item,key=item)
+                # for item in tasks:
+                #     button=st.button("item")

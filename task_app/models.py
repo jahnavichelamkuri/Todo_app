@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Task(models.Model):
-    user =models.ForeignKey(User, on_delete=models.CASCADE, null=True,blank=True)
+    user =models.CharField(max_length=40, null=True,blank=True)
     task = models.CharField(max_length=200)
     description =models.TextField(max_length = 1000,null=True, blank=True)
     status = models.CharField(max_length=20, default='In Progress')
