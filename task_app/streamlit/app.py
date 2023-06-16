@@ -1,3 +1,4 @@
+from turtle import pd
 import streamlit as st
 
 import requests
@@ -114,6 +115,9 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
     selected = option_menu(
         menu_title="Menu",
         options= ["To-Do","History"],
+        icons=["card-list","clock-history"],
+        menu_icon="cast",
+        default_index=0,
         orientation = "horizontal",
     )
     if selected == "To-Do":
@@ -123,7 +127,7 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
             task = st.text_input("Task")
             add = st.button("ADD TASK")
             data ={
-                "user ":userName,
+                "user":userName,
                 "task" :task,
                 "description":"",
                 "status":"In Progress",
@@ -148,12 +152,48 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
             response = requests.get(url, headers=headers,params=data)
             if response.status_code == 200:
                 data = response.json()
-                # st.write(data)
                 tasks = data['task']
 
                 # for i in range(len(tasks)):
                 #     st.write(tasks[i])
                 for item in tasks:
-                    task_button=st.checkbox(item,key=item)
+                    task_completed=st.checkbox(item,key=item)
                 # for item in tasks:
                 #     button=st.button("item")
+                    if task_completed:
+                        description = st.text_area("Description")
+                        add = st.button("click")
+                        if add:
+                            url=local_host+'todo/?type=update'
+                            headers = {'Authorization': f'Bearer {token}'}
+                            data={
+                                "user":userName,
+                                "task":item,
+                                "description":description,
+                                "status":"done",
+                            }
+                            response=requests.post(url,headers=headers,params=data)
+                            if response.status_code==200:
+                                data=response.json()
+                                st.write(data)
+                                st.write(data['message'])
+                                
+                
+
+    if selected == "History":
+        
+        url=local_host+'todo/?type=history'
+        headers = {'Authorization': f'Bearer {token}'}
+        data={
+            "user":userName,
+        }
+        
+        response=requests.post(url,headers=headers,params=data)
+                        
+        if response.status_code == 200:
+            data = response.json()
+            tasks = data['tasklist']
+            for i in range(len(tasks)):
+                st.subheader(tasks[i])
+        else:
+            st.error(f'Error: {response.status_code}')

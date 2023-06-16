@@ -22,26 +22,44 @@ def create_task(request,user,task,description,status):
     return response_data
 
 
-def fetch_data(request,user):
-    data = Task.objects.filter(user=user,status="In Progress")
-    task_list = []
-    for item in data:
-        task_list.append(item.task)
-            
+
+
+def fetch_data(request, user):
+    tasks = Task.objects.filter(user=user, status="In Progress")
+    taskss = []
+    for i in tasks:
+        taskss.append(i.task)
+        # print(task_list)
+
     response_data = {
-        "task" : task_list,
+        'task' : taskss
     }
-    print(task_list)
-            
+
     return response_data
 
-def update_task(request,user):
-    pass
+
+def update_task(request,user,task,description,status):
+    ut=Task.objects.filter(user=user,task=task,status='In Progress').first()
+    ut.description=description
+    ut.status=status
+    ut.save()
+    response_data={'message':"Task status updated successfully"}
+    return response_data
 
 
-def read_task(request):
-    
-       pass
+
+def history_data(request,user):
+   
+    hd=Task.objects.filter(user=user,status="done")
+    # print(hd)
+    task_list=[]
+    # print(task_list)
+    status_list=[]
+    for item in hd:
+        task_list.append(item.task)
+        # status_list.append(item['status'])
+    response_data={"tasklist":task_list}
+    return response_data
 
 class Todo(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -50,6 +68,8 @@ class Todo(APIView):
         try:
             type = self.request.GET.get('type')
             user = self.request.GET.get("user")
+
+            # print(user)
             task = self.request.GET.get("task")
             description= self.request.GET.get("description")
             status = self.request.GET.get("status")
@@ -57,11 +77,11 @@ class Todo(APIView):
                 response = create_task(request)
             elif type == "update":
                 response =update_task(request)
-            elif type =="read":
-                response = read_task(request)
+            elif type =="history":
+                response = history_data(request)
             elif type =="fetch_data":
                 response = fetch_data(request,user)
-            return JsonResponse(response)
+            return JsonResponse(response,safe=False)
         except Exception as e:
             return Response({'error': str(e)})
 
@@ -78,12 +98,12 @@ class Todo(APIView):
             if type =="create":
                 response = create_task(request,user,task,description,status)
             elif type == "update":
-                response =update_task(request)
-            elif type =="read":
-                response = read_task(request)
-            elif type =="delete":
+                response =update_task(request,user,task,description,status)
+            elif type =="history":
+                response = history_data(request,user)
+            elif type =="fetch_data":
                 response = fetch_data(request)
-            return JsonResponse(response)
+            return JsonResponse(response,safe=False)
         except Exception as e:
             return Response({'error': str(e)})
             
