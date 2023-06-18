@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import jwt
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 
 # def index(request):
@@ -38,11 +39,14 @@ def fetch_data(request, user):
     return response_data
 
 
-def update_task(request,user,task,description,status):
+def update_task(request,user,task,description,status,upload_file):
     ut=Task.objects.filter(user=user,task=task,status='In Progress').first()
     ut.description=description
     ut.status=status
+    save_directory = 'taskfiles/'
+    ut.file = default_storage.save(save_directory + upload_file.name, upload_file)
     ut.save()
+
     response_data={'message':"Task status updated successfully"}
     return response_data
 
@@ -95,10 +99,11 @@ class Todo(APIView):
             task = self.request.GET.get("task")
             description= self.request.GET.get("description")
             status = self.request.GET.get("status")
+            upload_file= self.request.FILES.get('file')
             if type =="create":
                 response = create_task(request,user,task,description,status)
             elif type == "update":
-                response =update_task(request,user,task,description,status)
+                response =update_task(request,user,task,description,status,upload_file)
             elif type =="history":
                 response = history_data(request,user)
             elif type =="fetch_data":

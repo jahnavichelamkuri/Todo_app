@@ -1,10 +1,9 @@
-from turtle import pd
+import pandas as pd
 import streamlit as st
-
 import requests
 import altair as alt
 from streamlit_option_menu import option_menu
-
+import base64
 
 st.set_page_config(layout="wide")
 
@@ -40,22 +39,37 @@ def get_data(token):
         return None
 
 if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
-    # st.markdown(
-        
-    #     <style>
-    #     .login-container {
-    #         background-image: url('/home/jahnavi/Downloads/pexels-anthony-)-158834.jpg');
-    #         background-size: cover;
-    #         height: 100vh;
-    #         display: flex;
-    #         align-items: center;
-    #         justify-content: center;
-    #     }
-    #     </style>
-        
-    #     unsafe_allow_html=True
-    #            )
+
+
+    image_path = "/home/jahnavi/Downloads/pexels-miguel-á-padriñán-255379.jpg"  # Replace with the actual path to your image file
+
+    with open(image_path, "rb") as image_file:
+        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+    background_code = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpeg;base64,{encoded_image}");
+        background-attachment: fixed;
+        background-size: cover;
+    }}
+    </style>
+    """
+    st.markdown(background_code, unsafe_allow_html=True)
+
+   # col1, col2 = st.columns([9, 1])
+    col1,col2=st.columns(2)
     
+    with col2:
+        col1,col2,col3=st.columns(3)
+        
+        with col3:
+            todo_logo="/home/jahnavi/Downloads/todo__logo.png"
+            st.image(todo_logo, caption="", width=150)
+
+        
+    
+
     st.markdown("<h1 style='text-align: center; '>LOGIN PAGE</h1> <br>", unsafe_allow_html=True)
     col1,col2,col3 = st.columns(3)
     with col1:
@@ -87,7 +101,6 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
 
     token=st.session_state['token']    
     userName = session_state['username']
-   
 
 
     # def main():
@@ -162,7 +175,8 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
                 #     button=st.button("item")
                     if task_completed:
                         description = st.text_area("Description")
-                        add = st.button("click")
+                        file = st.file_uploader("Upload File")
+                        add = st.button("submit")
                         if add:
                             url=local_host+'todo/?type=update'
                             headers = {'Authorization': f'Bearer {token}'}
@@ -172,10 +186,13 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
                                 "description":description,
                                 "status":"done",
                             }
-                            response=requests.post(url,headers=headers,params=data)
+                            files={
+                                    'file':file
+                                   }
+                            response=requests.post(url,headers=headers,params=data,files=files)
                             if response.status_code==200:
                                 data=response.json()
-                                st.write(data)
+                                #st.write(data)
                                 st.write(data['message'])
                                 
                 
