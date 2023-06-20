@@ -98,7 +98,18 @@ if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
         else:
             st.error("Invalid username or password.")
 if 'logged_in' in st.session_state and st.session_state['logged_in']:
-
+    st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url("https://as1.ftcdn.net/v2/jpg/01/57/79/44/1000_F_157794453_O5Gxzpz71qMs4iPo0T7AQjrjXFhURw0f.jpg");
+                background-attachment: fixed;
+                background-size: cover
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
     token=st.session_state['token']    
     userName = session_state['username']
 
@@ -242,9 +253,9 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
             # else:
             #     st.error(f'Error: {response.status_code}')
     with col3:
-        col1,col2 = st.columns([4,6])
+        col1,col2 = st.columns([2,4])
         with col2:
             image = "/home/jahnavi/Downloads/profile.jpg"
-            st.image(image, caption=userName, width=150)
+            st.image(image, caption=userName, width=100)
 
             
