@@ -124,93 +124,127 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
 
     # if _name_ == "_main_":
     #     main()
-
-    selected = option_menu(
-        menu_title="Menu",
-        options= ["To-Do","History"],
-        icons=["card-list","clock-history"],
-        menu_icon="cast",
-        default_index=0,
-        orientation = "horizontal",
-    )
-    if selected == "To-Do":
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.title("To-Do")
-            task = st.text_input("Task")
-            add = st.button("ADD TASK")
-            data ={
-                "user":userName,
-                "task" :task,
-                "description":"",
-                "status":"In Progress",
-            }
-            if add:
-                url=local_host+'todo/?type=create'
+    col1,col3 = st.columns([8,2])
+    with col1:
+        selected = option_menu(
+            menu_title="Menu",
+            options= ["To-Do","History"],
+            icons=["card-list","clock-history"],
+            menu_icon="cast",
+            default_index=0,
+            orientation = "horizontal",
+        )
+        if selected == "To-Do":
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.title("To-Do")
+                task = st.text_input("Task")
+                add = st.button("ADD TASK")
+                data ={
+                    "user":userName,
+                    "task" :task,
+                    "description":"",
+                    "status":"In Progress",
+                }
+                if add:
+                    url=local_host+'todo/?type=create'
+                    headers = {'Authorization': f'Bearer {token}'}
+                    response=requests.post(url,headers=headers,params=data)
+                    if response.status_code == 200:
+                        st.success("added")
+                    else:
+                        st.error("Failed")
+                
+            with col2:
+                # st.sidebar.title("Menu")
+                st.title("Tasks List")
+                url = local_host + 'todo/?type=fetch_data'
                 headers = {'Authorization': f'Bearer {token}'}
-                response=requests.post(url,headers=headers,params=data)
+                data = {
+                    "user" :userName
+                }
+                response = requests.get(url, headers=headers,params=data)
                 if response.status_code == 200:
-                    st.success("added")
-                else:
-                    st.error("Failed")
+                    data = response.json()
+                    tasks = data['task']
+
+                    # for i in range(len(tasks)):
+                    #     st.write(tasks[i])
+                    for item in tasks:
+                        task_completed=st.checkbox(item,key=item)
+                    # for item in tasks:
+                    #     button=st.button("item")
+                        if task_completed:
+                            description = st.text_area("Description")
+                            file = st.file_uploader("Upload File")
+                            add = st.button("submit")
+                            if add:
+                                url=local_host+'todo/?type=update'
+                                headers = {'Authorization': f'Bearer {token}'}
+                                data={
+                                    "user":userName,
+                                    "task":item,
+                                    "description":description,
+                                    "status":"done",
+                                }
+                                files={
+                                        'file':file
+                                    }
+                                response=requests.post(url,headers=headers,params=data,files=files)
+                                if response.status_code==200:
+                                    data=response.json()
+                                    #st.write(data)
+                                    st.write(data['message'])
+                                    
+                    
+
+        if selected == "History":
             
-        with col2:
-            # st.sidebar.title("Menu")
-            st.title("Tasks List")
-            url = local_host + 'todo/?type=fetch_data'
+            url=local_host+'todo/?type=history'
             headers = {'Authorization': f'Bearer {token}'}
-            data = {
-                "user" :userName
+            data={
+                "user":userName,
             }
-            response = requests.get(url, headers=headers,params=data)
+            
+            response=requests.get(url,headers=headers,params=data)
+                            
             if response.status_code == 200:
                 data = response.json()
-                tasks = data['task']
-
-                # for i in range(len(tasks)):
-                #     st.write(tasks[i])
-                for item in tasks:
-                    task_completed=st.checkbox(item,key=item)
-                # for item in tasks:
-                #     button=st.button("item")
-                    if task_completed:
-                        description = st.text_area("Description")
-                        file = st.file_uploader("Upload File")
-                        add = st.button("submit")
-                        if add:
-                            url=local_host+'todo/?type=update'
-                            headers = {'Authorization': f'Bearer {token}'}
-                            data={
-                                "user":userName,
-                                "task":item,
-                                "description":description,
-                                "status":"done",
+                tasks = data['tasklist']
+                files = data['files']
+                description = data['description']
+                for i in range(len(tasks)):
+                    details = st.button(f'{i+1}.{tasks[i]}')
+                    # Apply CSS styles to hide the button structure
+                    button_style = """
+                            <style>
+                            .stButton>button {
+                                background: none;
+                                border: none;
+                                padding: 0;
+                                margin: 0;
+                                font-size: inherit;
+                                font-family: inherit;
+                                cursor: pointer;
+                                outline: inherit;
                             }
-                            files={
-                                    'file':file
-                                   }
-                            response=requests.post(url,headers=headers,params=data,files=files)
-                            if response.status_code==200:
-                                data=response.json()
-                                #st.write(data)
-                                st.write(data['message'])
-                                
-                
+                            </style>
+                        """
 
-    if selected == "History":
-        
-        url=local_host+'todo/?type=history'
-        headers = {'Authorization': f'Bearer {token}'}
-        data={
-            "user":userName,
-        }
-        
-        response=requests.post(url,headers=headers,params=data)
-                        
-        if response.status_code == 200:
-            data = response.json()
-            tasks = data['tasklist']
-            for i in range(len(tasks)):
-                st.subheader(tasks[i])
-        else:
-            st.error(f'Error: {response.status_code}')
+                        # Display the CSS styles
+                    st.markdown(button_style, unsafe_allow_html=True)
+                    if details:
+                        st.write("Description:", description[i])                        
+                        st.write("click the link to download the file:", files[i])         
+            else:
+                st.error("Failed to fetch data from the backend")
+
+            # else:
+            #     st.error(f'Error: {response.status_code}')
+    with col3:
+        col1,col2 = st.columns([4,6])
+        with col2:
+            image = "/home/jahnavi/Downloads/profile.jpg"
+            st.image(image, caption=userName, width=150)
+
+            

@@ -57,32 +57,41 @@ def history_data(request,user):
     hd=Task.objects.filter(user=user,status="done")
     # print(hd)
     task_list=[]
+    files = []
+    description = []
     # print(task_list)
-    status_list=[]
+    
     for item in hd:
         task_list.append(item.task)
-        # status_list.append(item['status'])
-    response_data={"tasklist":task_list}
+        file_url = request.build_absolute_uri(item.file.url)
+        files.append(file_url) 
+        description.append(item.description)
+        
+    response_data={"tasklist":task_list,
+                   "files": files,
+                   "description": description,}
     return response_data
 
 class Todo(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self,request,*args,**kwargs):
+        print("GET")
         try:
             type = self.request.GET.get('type')
             user = self.request.GET.get("user")
 
-            # print(user)
+            print(user)
             task = self.request.GET.get("task")
             description= self.request.GET.get("description")
             status = self.request.GET.get("status")
+            upload_file= self.request.FILES.get('file')
             if type =="create":
                 response = create_task(request)
             elif type == "update":
-                response =update_task(request)
+                response =update_task(request,user,task,description,status,upload_file)
             elif type =="history":
-                response = history_data(request)
+                response = history_data(request,user)
             elif type =="fetch_data":
                 response = fetch_data(request,user)
             return JsonResponse(response,safe=False)
