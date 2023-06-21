@@ -41,21 +41,19 @@ def get_data(token):
 if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
 
 
-    image_path = "/home/jahnavi/Downloads/bg.jpg"  # Replace with the actual path to your image file
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background-image: url("https://wallpapercave.com/wp/wp2939993.jpg");
+             background-attachment: fixed;
+             background-size: cover
+         }}
+         </style>
+         """,
+         unsafe_allow_html=True
+     )
 
-    with open(image_path, "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-
-    background_code = f"""
-    <style>
-    .stApp {{
-        background-image: url("data:image/jpeg;base64,{encoded_image}");
-        background-attachment: fixed;
-        background-size: cover;
-    }}
-    </style>
-    """
-    st.markdown(background_code, unsafe_allow_html=True)
 
    # col1, col2 = st.columns([9, 1])
     col1,col2=st.columns(2)
@@ -255,7 +253,7 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
     with col3:
         col1,col2 = st.columns([2,4])
         with col2:
-            image = "/home/jahnavi/Downloads/profile.jpg"
+            image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXukZao_O4VE-CqwWJZiiE_Kq2yPwfWPDU5A&usqp=CAU"
             st.image(image, caption=userName, width=100)
 
             
