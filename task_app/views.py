@@ -76,12 +76,12 @@ class Todo(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self,request,*args,**kwargs):
-        print("GET")
+        #print("GET")
         try:
             type = self.request.GET.get('type')
             user = self.request.GET.get("user")
 
-            print(user)
+            #print(user)
             task = self.request.GET.get("task")
             description= self.request.GET.get("description")
             status = self.request.GET.get("status")
@@ -99,7 +99,7 @@ class Todo(APIView):
             return Response({'error': str(e)})
 
     def post(self,request,*args,**kwargs):
-        print("POST")
+        #print("POST")
         try:
             type = self.request.GET.get('type')
             print(type)
