@@ -62,7 +62,7 @@ if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
         col1,col2,col3=st.columns(3)
         
         with col3:
-            todo_logo="/home/jahnavi/Downloads/todo__logo.png"
+            todo_logo="https://play-lh.googleusercontent.com/KNInXD9XRXJPXtWEGWvNf_MnT664xCO3yBr-KP9wmogIPplkyQcZLahhCmf3h1mtldmz"
             st.image(todo_logo, caption="", width=150)
 
 
