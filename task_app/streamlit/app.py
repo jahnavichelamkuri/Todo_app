@@ -7,7 +7,7 @@ import base64
 
 st.set_page_config(layout="wide")
 
-local_host = 'http://localhost:8000/'
+local_host = 'http://192.168.70.4:8001/'
 
 session_state = st.session_state
 
@@ -41,7 +41,7 @@ def get_data(token):
 if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
 
 
-    image_path = "/home/jahnavi/Downloads/pexels-miguel-á-padriñán-255379.jpg"  # Replace with the actual path to your image file
+    image_path = "/home/jahnavi/Downloads/bg.jpg"  # Replace with the actual path to your image file
 
     with open(image_path, "rb") as image_file:
         encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
@@ -67,8 +67,8 @@ if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
             todo_logo="/home/jahnavi/Downloads/todo__logo.png"
             st.image(todo_logo, caption="", width=150)
 
-        
-    
+
+
 
     st.markdown("<h1 style='text-align: center; '>LOGIN PAGE</h1> <br>", unsafe_allow_html=True)
     col1,col2,col3 = st.columns(3)
@@ -102,7 +102,7 @@ if 'logged_in' in st.session_state and st.session_state['logged_in']:
             f"""
             <style>
             .stApp {{
-                background-image: url("https://as1.ftcdn.net/v2/jpg/01/57/79/44/1000_F_157794453_O5Gxzpz71qMs4iPo0T7AQjrjXFhURw0f.jpg");
+                background-image: url(https://img.freepik.com/premium-photo/colorful-background-with-blue-pink-swirls_789916-446.jpg?size=626&ext=jpg&ga=GA1.2.437861865.1687244541&semt=sph);
                 background-attachment: fixed;
                 background-size: cover
             }}
