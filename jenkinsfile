@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+   
+
+    stages {
+        stage('Clone GitHub Repo') {
+           steps {
+              git branch: 'master', url: 'https://github.com/jahnavichelamkuri/Todo_app.git'
+            }
+        }
+        
+        
+        
+        stage ('Build'){
+            steps {
+                sh 'pip install -r requirements.txt'
+                
+                sh ' sudo apt-get update'
+                //sh ' sudo apt-get install -y sqlite3'
+                // sh 'python3 manage.py makemigrations'
+                // sh 'python3 manage.py migrate'
+            }
+            
+        } 
+        
+    stage('Run Migrations') {
+        steps {
+            sh 'python3 manage.py migrate'
+            //  sh ' python3 manage.py runserver'
+        }
+    }
+    
+        stage('Run Streamlit Server') {
+            steps {
+                sh '/home/tharun/django_env/bin/streamlit run app.py &'
+            }
+        }
+        
+        
+        stage('Deploy') {
+            steps {
+                sh ' pip install gunicorn' 
+                sh 'ls'
+                sh 'pwd'
+                sh 'sudo cp -r ./* /home/tharun/tharun/Todo_app'
+                sh 'python3 manage.py migrate'
+                sh 'sudo systemctl stop gunicornth'
+                sh 'sudo systemctl start gunicornth'
+            }
+        }
+
+         //stage('Health Check') {
+             //steps {
+                // sh 'curl http://0.0.0.0:8001/health/'
+             //}
+         //}
+    }
+    //  triggers {
+    //   pollSCM('*/2 * * * *') // SCM trigger runs every 5 minutes
+    // }
+
+}
